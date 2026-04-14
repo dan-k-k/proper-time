@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="images/showcase1.gif" alt="Showcase falling into black hole" width="800">
+  <img src="images/showcase1.gif" alt="Showcase falling into black hole" width="900">
 </p>
 
 The red sphere is the true 3D black hole position with a non-spinning Schwarzschild radius.
