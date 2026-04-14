@@ -55,29 +55,24 @@ set_target_properties(RelSpacetimeCore PROPERTIES POSITION_INDEPENDENT_CODE ON)
 enable_testing()
 add_subdirectory(tests)
 
-# GODOT GDEXTENSION SETUP
+# Godot extension setup
 
-# 1. Tell godot-cpp where your custom API file is BEFORE adding the subdirectory
 set(GODOT_CUSTOM_API_FILE "${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/extension_api.json" CACHE STRING "Path to custom extension_api.json" FORCE)
 
-# 2. Add godot-cpp. CMake will automatically look for the CMakeLists.txt inside this folder!
 add_subdirectory(ThirdParty/godot-cpp)
 
-# 3. Create your Godot extension shared library (.dylib)
 add_library(RelSpacetimeGodot SHARED
     src_godot/register_types.cpp
     src_godot/GDEntityState.cpp
     src_godot/GDRelativityAPI.cpp
 )
 
-# 4. Link your wrapper to BOTH your core physics SDK and godot-cpp
 target_link_libraries(RelSpacetimeGodot 
     PRIVATE 
         RelSpacetimeCore 
         godot-cpp
 )
 
-# 5. Output the .dylib directly into your bin/ folder so Godot can find it
 set_target_properties(RelSpacetimeGodot PROPERTIES
     PREFIX "lib"
     SUFFIX ".macos.debug.framework.arm64.dylib" 

@@ -197,13 +197,13 @@ namespace RelSpacetime {
         }
         
         // packaging
-        result.primary.arrivalK = metric.enforceNullCondition(observerPos, -finalArrivalDir_p);
-        result.primary.arcTangentAxis = rotationAxis;
+        result.primary.arrivalK = metric.enforceNullCondition(observerPos, finalArrivalDir_p);
+        result.primary.arcTangentAxis = rotationAxis; 
         result.primary.tangentialStretch = std::clamp(stretch_p, 0.01, 15.0);
         result.primary.radialSquish = std::clamp(squish_p, 0.01, 1.0);
         result.primary.ringFactor = std::clamp(ringFactor_p, 0.0, 1.0);
 
-        result.secondary.arrivalK = metric.enforceNullCondition(observerPos, -finalArrivalDir_s);
+        result.secondary.arrivalK = metric.enforceNullCondition(observerPos, finalArrivalDir_s);
         result.secondary.arcTangentAxis = rotationAxis;
         result.secondary.tangentialStretch = std::clamp(stretch_s, 0.01, 15.0);
         result.secondary.radialSquish = std::clamp(squish_s, 0.01, 1.0);

@@ -26,18 +26,18 @@ namespace RelSpacetime {
         output.primary.isVisible = geodesicData.primary.isValid;
         if (output.primary.isVisible) {
             Eigen::Vector4d k_obs_covar_p = g_obs * geodesicData.primary.arrivalK;
-            double energy_obs_p = -k_obs_covar_p.dot(U_obs);
-            double energy_emit_p = -k_obs_covar_p.dot(primaryPastState.fourVelocity);
+            double energy_obs_p = k_obs_covar_p.dot(U_obs);
+            double energy_emit_p = k_obs_covar_p.dot(primaryPastState.fourVelocity); 
             
             output.primary.dopplerShift = energy_obs_p / energy_emit_p;
             output.primary.beamingFactor = std::pow(output.primary.dopplerShift, 3.0 + spectralIndex);
 
-            // Apparent direction primary
-            double E_local_p = std::max(energy_obs_p, 1e-12); 
-            double app_x_p = -k_obs_covar_p.dot(observerFrame.getE1());
-            double app_y_p = -k_obs_covar_p.dot(observerFrame.getE2());
-            double app_z_p = -k_obs_covar_p.dot(observerFrame.getE3());
-            output.primary.apparentDirection = Eigen::Vector3d(app_x_p, app_y_p, app_z_p) / E_local_p;
+            // Project Apparent Direction
+            double E_local_p = std::abs(energy_obs_p); 
+            double app_x_p = k_obs_covar_p.dot(observerFrame.getE1());
+            double app_y_p = k_obs_covar_p.dot(observerFrame.getE2());
+            double app_z_p = k_obs_covar_p.dot(observerFrame.getE3());
+            output.primary.apparentDirection = Eigen::Vector3d(app_x_p, app_y_p, app_z_p) / std::max(E_local_p, 1e-12);
 
             Eigen::Vector4d global_axis_p(0.0, 
                                           geodesicData.primary.arcTangentAxis.x(), 
@@ -62,18 +62,18 @@ namespace RelSpacetime {
         output.secondary.isVisible = geodesicData.secondary.isValid;
         if (output.secondary.isVisible) {
             Eigen::Vector4d k_obs_covar_s = g_obs * geodesicData.secondary.arrivalK;
-            double energy_obs_s = -k_obs_covar_s.dot(U_obs);
-            double energy_emit_s = -k_obs_covar_s.dot(primaryPastState.fourVelocity);
+            double energy_obs_s = k_obs_covar_s.dot(U_obs);
+            double energy_emit_s = k_obs_covar_s.dot(secondaryPastState.fourVelocity); 
             
             output.secondary.dopplerShift = energy_obs_s / energy_emit_s;
             output.secondary.beamingFactor = std::pow(output.secondary.dopplerShift, 3.0 + spectralIndex);
 
-            // Apparent direction secondary
-            double E_local_s = std::max(energy_obs_s, 1e-12); 
-            double app_x_s = -k_obs_covar_s.dot(observerFrame.getE1());
-            double app_y_s = -k_obs_covar_s.dot(observerFrame.getE2());
-            double app_z_s = -k_obs_covar_s.dot(observerFrame.getE3());
-            output.primary.apparentDirection = Eigen::Vector3d(app_x_s, app_y_s, app_z_s) / E_local_s;
+            // Project Apparent Direction
+            double E_local_s = std::abs(energy_obs_s);
+            double app_x_s = k_obs_covar_s.dot(observerFrame.getE1());
+            double app_y_s = k_obs_covar_s.dot(observerFrame.getE2());
+            double app_z_s = k_obs_covar_s.dot(observerFrame.getE3());
+            output.secondary.apparentDirection = Eigen::Vector3d(app_x_s, app_y_s, app_z_s) / std::max(E_local_s, 1e-12);
 
             Eigen::Vector4d global_axis_s(0.0, 
                                           geodesicData.secondary.arcTangentAxis.x(), 
@@ -179,8 +179,7 @@ namespace RelSpacetime {
         // To find where the BH visually appears, we must track a photon ARRIVING from it.
         // An arriving photon from the BH center is moving OUTWARDS (k_r = +1.0).
         // projectToSky returns the arriving photon's momentum. We look in the exact opposite direction.
-        Eigen::Vector3d arriving_center_k = projectToSky(-1.0, 1.0, 0.0, 0.0);
-        Eigen::Vector3d view_center = -arriving_center_k.normalized();
+        Eigen::Vector3d view_center = projectToSky(-1.0, -1.0, 0.0, 0.0).normalized();
         output.apparentDirection = view_center;
 
         // The shadow edge params (Polar Ray)
