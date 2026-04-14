@@ -51,6 +51,7 @@ install_manifest.txt
 compile_commands.json
 CTestTestfile.cmake
 _deps/
+videos/
 
 # macOS specific stuff
 .DS_Store
